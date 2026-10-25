@@ -1,0 +1,6 @@
+{
+  "name": "AURA Digital // Creative B2B Engineering España",
+  "description": "Estudio de ingeniería web de alto rendimiento y arquitectura B2B en España. Desarrollo SaaS, agentes de IA y túneles de conversión con diseño futurista y cumplimiento RGPD/LSSI.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
