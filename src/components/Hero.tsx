@@ -57,7 +57,7 @@ const statItemVariants = {
 };
 
 export const Hero: React.FC<HeroProps> = ({ onOpenBooking, onScrollToLeadMagnet }) => {
-  const { t } = useI18n();
+  const { t, lang } = useI18n();
 
   return (
     <section className="relative min-h-[92vh] flex items-center justify-center pt-32 pb-20 px-4 sm:px-8 overflow-hidden">
@@ -74,6 +74,32 @@ export const Hero: React.FC<HeroProps> = ({ onOpenBooking, onScrollToLeadMagnet 
         animate="visible"
         className="relative z-10 max-w-5xl mx-auto text-center flex flex-col items-center"
       >
+        {/* Modern "Under Construction // En Construcción" Status Badge */}
+        <motion.div
+          variants={itemVariants}
+          className="mb-4 inline-flex flex-wrap items-center justify-center gap-2 px-4 py-1.5 rounded-full bg-gradient-to-r from-amber-500/15 via-blue-500/15 to-violet-500/15 border border-amber-500/40 shadow-lg shadow-amber-500/10 backdrop-blur-md"
+        >
+          <span className="relative flex h-2 w-2">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75" />
+            <span className="relative inline-flex rounded-full h-2 w-2 bg-amber-500" />
+          </span>
+          <span className="text-[11px] sm:text-xs font-mono font-bold tracking-wider uppercase text-amber-400">
+            {lang === 'es'
+              ? 'Plataforma en Construcción // Lanzamiento Q2 2026'
+              : lang === 'fr'
+              ? 'Plateforme en Construction // Lancement Q2 2026'
+              : 'Platform Under Construction // Launching Q2 2026'}
+          </span>
+          <span className="hidden sm:inline text-slate-500" aria-hidden="true">•</span>
+          <span className="text-[10px] sm:text-[11px] font-mono text-cyan-300 hidden sm:inline">
+            {lang === 'es'
+              ? 'Ingeniería 87% Completada'
+              : lang === 'fr'
+              ? 'Ingénierie à 87% Finalisée'
+              : '87% Core Systems Completed'}
+          </span>
+        </motion.div>
+
         {/* Subtle unboxed metadata kicker */}
         <motion.div
           variants={itemVariants}

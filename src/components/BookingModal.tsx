@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { X, Calendar, CheckCircle2, ArrowRight, AlertCircle, Sparkles } from 'lucide-react';
 import { useI18n } from '../i18n/I18nContext';
 
@@ -8,6 +8,78 @@ interface BookingModalProps {
   preselectedService?: string;
 }
 
+const normalizeService = (srv?: string): string => {
+  if (!srv) return '';
+  const s = srv.toLowerCase();
+  if (s === 'landing-page' || s.includes('landing')) return 'landing-page';
+  if (s === 'site-vitrine' || s.includes('vitrine') || s.includes('showcase')) return 'site-vitrine';
+  if (s === 'refonte-web' || s.includes('refonte') || s.includes('moderniz') || s.includes('redesign') || s.includes('mantenimiento') || s.includes('sla')) return 'refonte-web';
+  if (s === 'site-institutionnel' || s.includes('corporate') || s.includes('institution') || s.includes('multi')) return 'site-institutionnel';
+  if (s === 'saas-platform' || s.includes('saas') || s.includes('platform')) return 'saas-platform';
+  if (s === 'web-app' || s.includes('app') || s.includes('sur-mesure') || s.includes('medida')) return 'web-app';
+  if (s === 'portail-client' || s.includes('portail') || s.includes('portal') || s.includes('membre') || s.includes('member')) return 'portail-client';
+  if (s === 'api-integration' || s.includes('api') || s.includes('agent') || s.includes('ia') || s.includes('ai')) return 'api-integration';
+  if (s === 'ui-ux-design' || s.includes('design') || s.includes('prototype') || s.includes('ui') || s.includes('ux')) return 'ui-ux-design';
+  if (s === 'audit-performance' || s.includes('audit') || s.includes('vital') || s.includes('perf')) return 'audit-performance';
+  return srv;
+};
+
+export const SERVICE_PRICING_MAP: Record<
+  string,
+  { label: string; price: string; group: string }
+> = {
+  'landing-page': {
+    label: 'Landing Page Haute Conversion',
+    price: '500 € - 2.500 €',
+    group: 'Solutions Web',
+  },
+  'site-vitrine': {
+    label: 'Site Vitrine Sur-Mesure',
+    price: '800 € - 6.500 €',
+    group: 'Solutions Web',
+  },
+  'refonte-web': {
+    label: 'Refonte & Modernisation Web',
+    price: '1.500 € - 5.000 €',
+    group: 'Solutions Web',
+  },
+  'site-institutionnel': {
+    label: 'Site Corporate Multi-langues',
+    price: '2.000 € - 8.000 €',
+    group: 'Solutions Web',
+  },
+  'saas-platform': {
+    label: 'SaaS Full-Stack & Plateformes',
+    price: '15.000 € - 45.000 €+',
+    group: 'Ingénierie & SaaS',
+  },
+  'web-app': {
+    label: 'Application Web Sur-Mesure',
+    price: '8.000 € - 25.000 €',
+    group: 'Ingénierie & SaaS',
+  },
+  'portail-client': {
+    label: 'Portail Client / Espace Membre',
+    price: '6.000 € - 18.000 €',
+    group: 'Ingénierie & SaaS',
+  },
+  'api-integration': {
+    label: 'Architecture & APIs',
+    price: '4.000 € - 12.000 €',
+    group: 'Ingénierie & SaaS',
+  },
+  'ui-ux-design': {
+    label: 'Design UI/UX & Prototypes',
+    price: '1.000 € - 4.000 €',
+    group: 'Design & Audit',
+  },
+  'audit-performance': {
+    label: 'Audit Technique & Performance',
+    price: '900 € - 1.500 €',
+    group: 'Design & Audit',
+  },
+};
+
 export const BookingModal: React.FC<BookingModalProps> = ({
   isOpen,
   onClose,
@@ -15,16 +87,44 @@ export const BookingModal: React.FC<BookingModalProps> = ({
 }) => {
   const { t } = useI18n();
 
+  const initialService = normalizeService(preselectedService) || '';
+  const initialBudget = initialService && SERVICE_PRICING_MAP[initialService]
+    ? SERVICE_PRICING_MAP[initialService].price
+    : '';
+
   const [formData, setFormData] = useState({
     name: '',
     email: '',
     company: '',
-    service: preselectedService || 'SaaS Full-Stack',
-    budget: '10.000€ - 25.000€',
+    service: initialService,
+    budget: initialBudget,
     timeline: '1 a 2 meses',
     projectDetails: '',
     rgpdConsent: false,
   });
+
+  useEffect(() => {
+    if (preselectedService) {
+      const normalized = normalizeService(preselectedService);
+      setFormData((prev) => ({
+        ...prev,
+        service: normalized,
+        budget: SERVICE_PRICING_MAP[normalized]?.price || prev.budget,
+      }));
+    }
+  }, [preselectedService, isOpen]);
+
+  const handleServiceChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const selectedServiceKey = e.target.value;
+    const matchingPrice = SERVICE_PRICING_MAP[selectedServiceKey]?.price;
+    setFormData((prev) => ({
+      ...prev,
+      service: selectedServiceKey,
+      budget: matchingPrice || prev.budget,
+    }));
+  };
+
+  const activeServiceInfo = formData.service ? SERVICE_PRICING_MAP[formData.service] : null;
 
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const [errorMessage, setErrorMessage] = useState('');
@@ -39,6 +139,12 @@ export const BookingModal: React.FC<BookingModalProps> = ({
     if (!formData.email.trim() || !formData.email.includes('@')) {
       setStatus('error');
       setErrorMessage('Por favor introduce un email profesional válido / Please enter a valid email.');
+      return;
+    }
+
+    if (!formData.service) {
+      setStatus('error');
+      setErrorMessage('Veuillez sélectionner un service requis / Por favor selecciona un servicio.');
       return;
     }
 
@@ -183,37 +289,101 @@ export const BookingModal: React.FC<BookingModalProps> = ({
                 </div>
 
                 <div>
-                  <label className="block text-xs font-mono text-slate-300 mb-1.5">
-                    {t.bookingModal.serviceLabel}
+                  <label htmlFor="service-select" className="block text-xs font-mono text-slate-300 mb-1.5 font-medium">
+                    Service Requis <span className="text-blue-400">*</span>
                   </label>
                   <select
+                    id="service-select"
+                    name="service"
                     value={formData.service}
-                    onChange={(e) => setFormData({ ...formData, service: e.target.value })}
-                    className="w-full px-4 py-2.5 rounded-xl bg-black/50 border border-white/10 text-white text-sm focus:outline-none focus:border-blue-500"
+                    onChange={handleServiceChange}
+                    required
+                    className="w-full px-4 py-2.5 rounded-xl bg-black/60 border border-white/10 text-white text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 cursor-pointer"
                   >
-                    <option value="SaaS Full-Stack">SaaS Full-Stack & Platforms</option>
-                    <option value="Agentes de IA">AI Agents & Autonomous Pipelines</option>
-                    <option value="Optimización Core Web Vitals">Core Web Vitals & Latency Tuning</option>
-                    <option value="Mantenimiento y RGPD">Enterprise SLA & GDPR Shield</option>
+                    <option value="" disabled>Sélectionnez un service...</option>
+                    
+                    <optgroup label="Solutions Web" className="bg-[#0f111a] text-slate-300 font-semibold">
+                      <option value="landing-page" className="bg-[#07070f] text-white">Landing Page Haute Conversion (500 € - 2.500 €)</option>
+                      <option value="site-vitrine" className="bg-[#07070f] text-white">Site Vitrine Sur-Mesure (800 € - 6.500 €)</option>
+                      <option value="refonte-web" className="bg-[#07070f] text-white">Refonte & Modernisation Web (1.500 € - 5.000 €)</option>
+                      <option value="site-institutionnel" className="bg-[#07070f] text-white">Site Corporate Multi-langues (2.000 € - 8.000 €)</option>
+                    </optgroup>
+                    
+                    <optgroup label="Ingénierie & SaaS" className="bg-[#0f111a] text-slate-300 font-semibold">
+                      <option value="saas-platform" className="bg-[#07070f] text-white">SaaS Full-Stack & Plateformes (15.000 € - 45.000 €+)</option>
+                      <option value="web-app" className="bg-[#07070f] text-white">Application Web Sur-Mesure (8.000 € - 25.000 €)</option>
+                      <option value="portail-client" className="bg-[#07070f] text-white">Portail Client / Espace Membre (6.000 € - 18.000 €)</option>
+                      <option value="api-integration" className="bg-[#07070f] text-white">Architecture & APIs (4.000 € - 12.000 €)</option>
+                    </optgroup>
+                    
+                    <optgroup label="Design & Audit" className="bg-[#0f111a] text-slate-300 font-semibold">
+                      <option value="ui-ux-design" className="bg-[#07070f] text-white">Design UI/UX & Prototypes (1.000 € - 4.000 €)</option>
+                      <option value="audit-performance" className="bg-[#07070f] text-white">Audit Technique & Performance (900 € - 1.500 €)</option>
+                    </optgroup>
                   </select>
                 </div>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-mono text-slate-300 mb-1.5">
-                    {t.bookingModal.budgetLabel}
-                  </label>
+                  <div className="flex items-center justify-between mb-1.5">
+                    <label htmlFor="budget-select" className="block text-xs font-mono text-slate-300 font-medium">
+                      {t.bookingModal.budgetLabel || 'Budget Estimé'} <span className="text-blue-400">*</span>
+                    </label>
+                    {activeServiceInfo && (
+                      <span className="text-[10px] sm:text-[11px] font-mono text-[#D4AF37] bg-[#D4AF37]/15 px-2 py-0.5 rounded border border-[#D4AF37]/35 font-semibold">
+                        {activeServiceInfo.price}
+                      </span>
+                    )}
+                  </div>
                   <select
+                    id="budget-select"
+                    name="budget"
                     value={formData.budget}
                     onChange={(e) => setFormData({ ...formData, budget: e.target.value })}
-                    className="w-full px-4 py-2.5 rounded-xl bg-black/50 border border-white/10 text-white text-sm focus:outline-none focus:border-blue-500"
+                    required
+                    className="w-full px-4 py-2.5 rounded-xl bg-black/60 border border-white/10 text-white text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 cursor-pointer"
                   >
-                    <option value="5.000€ - 10.000€">5.000€ - 10.000€</option>
-                    <option value="10.000€ - 25.000€">10.000€ - 25.000€</option>
-                    <option value="25.000€ - 50.000€">25.000€ - 50.000€</option>
-                    <option value="+50.000€">+50.000€ (Enterprise)</option>
+                    <option value="" disabled>Sélectionnez un budget...</option>
+
+                    <optgroup label="Tarifs par Service Requis (Solutions Web)" className="bg-[#0f111a] text-slate-300 font-semibold">
+                      <option value="500 € - 2.500 €" className="bg-[#07070f] text-white">500 € - 2.500 € (Landing Page Haute Conversion)</option>
+                      <option value="800 € - 6.500 €" className="bg-[#07070f] text-white">800 € - 6.500 € (Site Vitrine Sur-Mesure)</option>
+                      <option value="1.500 € - 5.000 €" className="bg-[#07070f] text-white">1.500 € - 5.000 € (Refonte & Modernisation Web)</option>
+                      <option value="2.000 € - 8.000 €" className="bg-[#07070f] text-white">2.000 € - 8.000 € (Site Corporate Multi-langues)</option>
+                    </optgroup>
+
+                    <optgroup label="Tarifs par Service Requis (Ingénierie & SaaS)" className="bg-[#0f111a] text-slate-300 font-semibold">
+                      <option value="15.000 € - 45.000 €+" className="bg-[#07070f] text-white">15.000 € - 45.000 €+ (SaaS Full-Stack & Plateformes)</option>
+                      <option value="8.000 € - 25.000 €" className="bg-[#07070f] text-white">8.000 € - 25.000 € (Application Web Sur-Mesure)</option>
+                      <option value="6.000 € - 18.000 €" className="bg-[#07070f] text-white">6.000 € - 18.000 € (Portail Client / Espace Membre)</option>
+                      <option value="4.000 € - 12.000 €" className="bg-[#07070f] text-white">4.000 € - 12.000 € (Architecture & APIs)</option>
+                    </optgroup>
+
+                    <optgroup label="Tarifs par Service Requis (Design & Audit)" className="bg-[#0f111a] text-slate-300 font-semibold">
+                      <option value="1.000 € - 4.000 €" className="bg-[#07070f] text-white">1.000 € - 4.000 € (Design UI/UX & Prototypes)</option>
+                      <option value="900 € - 1.500 €" className="bg-[#07070f] text-white">900 € - 1.500 € (Audit Technique & Performance)</option>
+                    </optgroup>
+
+                    <optgroup label="Enveloppes Globales & Enterprise" className="bg-[#0f111a] text-slate-300 font-semibold">
+                      <option value="5.000 € - 10.000 €" className="bg-[#07070f] text-white">5.000 € - 10.000 € (Enveloppe Globale PME)</option>
+                      <option value="10.000 € - 25.000 €" className="bg-[#07070f] text-white">10.000 € - 25.000 € (Projet Structuré)</option>
+                      <option value="25.000 € - 50.000 €" className="bg-[#07070f] text-white">25.000 € - 50.000 € (Programme Digital Avancé)</option>
+                      <option value="+50.000 € (Enterprise)" className="bg-[#07070f] text-white">+50.000 € (Enterprise Custom SLA)</option>
+                    </optgroup>
                   </select>
+
+                  {/* Dynamic Pricing Callout */}
+                  {activeServiceInfo ? (
+                    <div className="mt-2 p-2 rounded-lg bg-blue-950/40 border border-blue-500/25 text-[11px] font-mono flex items-center justify-between text-slate-300">
+                      <span className="truncate">Tarif indicatif du service :</span>
+                      <span className="text-[#D4AF37] font-bold shrink-0 ml-2">{activeServiceInfo.price}</span>
+                    </div>
+                  ) : (
+                    <div className="mt-2 text-[11px] font-mono text-slate-400">
+                      💡 Chaque prix de service s’affiche et s’aligne ici automatiquement.
+                    </div>
+                  )}
                 </div>
 
                 <div>

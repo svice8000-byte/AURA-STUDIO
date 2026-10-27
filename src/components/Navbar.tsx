@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { Menu, X, ArrowUpRight, Globe } from 'lucide-react';
+import { Menu, X, ArrowUpRight, Globe, Sun, Moon } from 'lucide-react';
 import { Magnetic } from './Magnetic';
 import { useI18n } from '../i18n/I18nContext';
+import { useAccessibility } from '../context/AccessibilityContext';
 import { Language } from '../i18n/translations';
 
 interface NavbarProps {
@@ -11,6 +12,11 @@ interface NavbarProps {
 export const Navbar: React.FC<NavbarProps> = ({ onOpenBooking }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { lang, setLang, t } = useI18n();
+  const { theme, setTheme } = useAccessibility();
+
+  const toggleTheme = () => {
+    setTheme(theme === 'dark' ? 'light' : 'dark');
+  };
 
   const languages: { id: Language; label: string }[] = [
     { id: 'fr', label: 'FR' },
@@ -98,6 +104,26 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenBooking }) => {
             ))}
           </div>
 
+          {/* Streamlined Light / Dark Mode Toggle */}
+          <button
+            onClick={toggleTheme}
+            data-cursor="button"
+            aria-label={theme === 'dark' ? 'Activar Modo Claro' : 'Activar Modo Oscuro'}
+            title={theme === 'dark' ? 'Modo Claro / Light' : 'Modo Oscuro / Dark'}
+            className="relative flex items-center justify-center w-8 h-8 rounded-lg bg-black/50 border border-white/10 text-slate-300 hover:text-white hover:border-blue-400/40 transition-all cursor-pointer shadow-inner focus:outline-none focus:ring-1 focus:ring-blue-400"
+          >
+            <Sun
+              className={`w-4 h-4 text-amber-400 transition-all duration-300 ${
+                theme === 'light' ? 'opacity-100 rotate-0 scale-100' : 'opacity-0 -rotate-90 scale-50 absolute pointer-events-none'
+              }`}
+            />
+            <Moon
+              className={`w-4 h-4 text-blue-300 transition-all duration-300 ${
+                theme === 'dark' ? 'opacity-100 rotate-0 scale-100' : 'opacity-0 rotate-90 scale-50 absolute pointer-events-none'
+              }`}
+            />
+          </button>
+
           {/* Primary CTA */}
           <Magnetic strength={0.3}>
             <button
@@ -135,18 +161,27 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenBooking }) => {
               <Globe className="w-3.5 h-3.5 text-blue-400" />
               <span>Langue / Language / Idioma:</span>
             </span>
-            <div className="flex items-center gap-1">
-              {languages.map((item) => (
-                <button
-                  key={item.id}
-                  onClick={() => setLang(item.id)}
-                  className={`px-2.5 py-1 rounded text-xs font-mono font-bold ${
-                    lang === item.id ? 'bg-blue-600 text-white' : 'bg-white/5 text-slate-400'
-                  }`}
-                >
-                  {item.label}
-                </button>
-              ))}
+            <div className="flex items-center gap-2">
+              <button
+                onClick={toggleTheme}
+                aria-label={theme === 'dark' ? 'Activar Modo Claro' : 'Activar Modo Oscuro'}
+                className="flex items-center justify-center p-1.5 rounded-lg bg-white/10 text-slate-300 hover:text-white"
+              >
+                {theme === 'dark' ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-blue-400" />}
+              </button>
+              <div className="flex items-center gap-1">
+                {languages.map((item) => (
+                  <button
+                    key={item.id}
+                    onClick={() => setLang(item.id)}
+                    className={`px-2.5 py-1 rounded text-xs font-mono font-bold ${
+                      lang === item.id ? 'bg-blue-600 text-white' : 'bg-white/5 text-slate-400'
+                    }`}
+                  >
+                    {item.label}
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
 

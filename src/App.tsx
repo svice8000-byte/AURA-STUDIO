@@ -12,18 +12,20 @@ import { CookieBanner } from './components/CookieBanner';
 import { CustomCursor } from './components/CustomCursor';
 import { FAQ } from './components/FAQ';
 import { CaseStudies } from './components/CaseStudies';
+import { CountdownBanner } from './components/CountdownBanner';
+import { AccessibilityToolbar } from './components/AccessibilityToolbar';
+import { VirtualConsultant } from './components/VirtualConsultant';
 import { I18nProvider } from './i18n/I18nContext';
+import { AccessibilityProvider } from './context/AccessibilityContext';
 
 function AppContent() {
   const [isBookingOpen, setIsBookingOpen] = useState(false);
-  const [selectedServiceForBooking, setSelectedServiceForBooking] = useState<string>('SaaS Full-Stack');
+  const [selectedServiceForBooking, setSelectedServiceForBooking] = useState<string>('');
   const [isGuideReaderOpen, setIsGuideReaderOpen] = useState(false);
   const [legalModalType, setLegalModalType] = useState<'aviso-legal' | 'privacidad' | 'cookies' | null>(null);
 
   const handleOpenBooking = (service?: string) => {
-    if (service) {
-      setSelectedServiceForBooking(service);
-    }
+    setSelectedServiceForBooking(service || '');
     setIsBookingOpen(true);
   };
 
@@ -39,16 +41,22 @@ function AppContent() {
       {/* High-Performance Framer Motion Magnetic Cursor */}
       <CustomCursor />
 
+      {/* Floating Accessibility Toolbar (Dark, Light, High-Contrast & Font Scaling) */}
+      <AccessibilityToolbar />
+
       {/* Floating Top Bar with Language Switcher */}
       <Navbar onOpenBooking={() => handleOpenBooking()} />
 
       {/* Main Content Flow */}
-      <main>
+      <main id="main-content" tabIndex={-1} className="focus:outline-none">
         {/* Hero with interactive Canvas GLSL/Shader */}
         <Hero
           onOpenBooking={() => handleOpenBooking()}
           onScrollToLeadMagnet={handleScrollToLeadMagnet}
         />
+
+        {/* Live Countdown & Accessible Priority Intake Newsletter */}
+        <CountdownBanner />
 
         {/* Asymmetric Bento Grid Services */}
         <BentoGrid onSelectService={(service) => handleOpenBooking(service)} />
@@ -96,14 +104,21 @@ function AppContent() {
       <CookieBanner
         onOpenCookiesPolicy={() => setLegalModalType('cookies')}
       />
+
+      {/* Virtual Engineering Consultant (Gemini 3.8 Flash Agent) */}
+      <VirtualConsultant
+        onOpenBooking={(service) => handleOpenBooking(service)}
+      />
     </div>
   );
 }
 
 export default function App() {
   return (
-    <I18nProvider>
-      <AppContent />
-    </I18nProvider>
+    <AccessibilityProvider>
+      <I18nProvider>
+        <AppContent />
+      </I18nProvider>
+    </AccessibilityProvider>
   );
 }

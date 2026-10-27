@@ -229,6 +229,25 @@ export interface Translations {
     reject: string;
     accept: string;
   };
+  consultant: {
+    triggerBadge: string;
+    triggerTitle: string;
+    headerTitle: string;
+    headerSubtitle: string;
+    modelBadge: string;
+    welcomeMsg: string;
+    placeholder: string;
+    send: string;
+    clear: string;
+    minimize: string;
+    suggestedTitle: string;
+    suggestedPrompts: string[];
+    bookAudit: string;
+    thinkingText: string;
+    disclaimer: string;
+    errorMsg: string;
+    retry: string;
+  };
 }
 
 export const translations: Record<Language, Translations> = {
@@ -500,6 +519,30 @@ export const translations: Record<Language, Translations> = {
       reject: 'Solo Esenciales',
       accept: 'Aceptar Todas',
     },
+    consultant: {
+      triggerBadge: 'Agente IA',
+      triggerTitle: 'Consultor de Arquitectura B2B',
+      headerTitle: 'AURA Virtual Engineering Consultant',
+      headerSubtitle: 'Ingeniero de Sistemas Principal · Asesoría en Tiempo Real',
+      modelBadge: 'Gemini 3.8 Flash',
+      welcomeMsg: '¡Hola! Soy el Consultor de Arquitectura de AURA Digital. Puedo asesorarte sobre optimización de rendimiento (Core Web Vitals), cumplimiento legal RGPD/LSSI en España, migraciones SaaS o integración de agentes de IA privados. ¿Qué desafío técnico deseas resolver hoy?',
+      placeholder: 'Haz una pregunta sobre arquitectura B2B (ej. TTFB < 50ms, RGPD España, React 19)...',
+      send: 'Enviar Consulta',
+      clear: 'Reiniciar',
+      minimize: 'Minimizar',
+      suggestedTitle: 'Preguntas Arquitectónicas Frecuentes',
+      suggestedPrompts: [
+        '¿Cómo lograr TTFB < 50ms y 99+ en Lighthouse en un SaaS B2B?',
+        '¿Qué requisitos técnicos impone la LSSI/RGPD en España para captación B2B?',
+        '¿Cuál es la mejor arquitectura para integrar agentes IA sin exponer datos privados?',
+        '¿Vite + React 19 vs Next.js para un portal cliente de alta conversión?'
+      ],
+      bookAudit: 'Reservar Auditoría Técnica de Viabilidad',
+      thinkingText: 'Analizando arquitectura con Gemini 3.8 Flash...',
+      disclaimer: 'Orientación técnica generada en tiempo real mediante Gemini 3.8 Flash. Validada con los estándares de ingeniería de AURA Digital.',
+      errorMsg: 'No se pudo conectar con el servicio de arquitectura. Por favor verifica la conexión o reinténtalo.',
+      retry: 'Reintentar'
+    },
   },
   en: {
     nav: {
@@ -769,6 +812,30 @@ export const translations: Record<Language, Translations> = {
       reject: 'Essential Only',
       accept: 'Accept All',
     },
+    consultant: {
+      triggerBadge: 'AI Agent',
+      triggerTitle: 'B2B Architecture Consultant',
+      headerTitle: 'AURA Virtual Engineering Consultant',
+      headerSubtitle: 'Principal Systems Architect · Real-Time Guidance',
+      modelBadge: 'Gemini 3.8 Flash',
+      welcomeMsg: 'Hello! I am AURA Digital’s Virtual Engineering Consultant. I advise CTOs and founders on high-performance web systems, Core Web Vitals, Spanish/EU GDPR & LSSI compliance, and private enterprise AI agent pipelines. What architectural challenge are you facing?',
+      placeholder: 'Ask an architectural question (e.g., TTFB < 50ms, Spain LSSI compliance, React 19)...',
+      send: 'Send Inquiry',
+      clear: 'Clear',
+      minimize: 'Minimize',
+      suggestedTitle: 'Recommended Architectural Prompts',
+      suggestedPrompts: [
+        'How to achieve TTFB < 50ms and 99+ Lighthouse in a B2B SaaS platform?',
+        'What are the strict LSSI/GDPR requirements for B2B lead capture in Spain?',
+        'What is the optimal architecture for private AI agents without data leakage?',
+        'Vite + React 19 vs Next.js for high-conversion B2B client portals?'
+      ],
+      bookAudit: 'Book Technical Feasibility Audit',
+      thinkingText: 'Evaluating architecture with Gemini 3.8 Flash...',
+      disclaimer: 'Real-time architectural guidance powered by Gemini 3.8 Flash. Engineered to AURA Digital quality standards.',
+      errorMsg: 'Unable to reach the engineering consultant endpoint. Please check your network and try again.',
+      retry: 'Retry'
+    },
   },
   fr: {
     nav: {
@@ -1037,6 +1104,30 @@ export const translations: Record<Language, Translations> = {
       moreInfo: 'En savoir plus',
       reject: 'Essentiels Uniquement',
       accept: 'Tout Accepter',
+    },
+    consultant: {
+      triggerBadge: 'Agent IA',
+      triggerTitle: 'Consultant Architecture B2B',
+      headerTitle: 'AURA Virtual Engineering Consultant',
+      headerSubtitle: 'Architecte Systèmes Principal · Conseil Temps Réel',
+      modelBadge: 'Gemini 3.8 Flash',
+      welcomeMsg: 'Bonjour ! Je suis le Consultant Virtuel d’AURA Digital. J’accompagne les directeurs techniques et fondateurs B2B sur l’optimisation de performance (Core Web Vitals), la conformité RGPD/LSSI en Espagne, les architectures React 19 / Node.js et l’intégration d’agents IA privés. Quel est votre défi technique ?',
+      placeholder: 'Posez une question d’architecture B2B (ex: TTFB < 50ms, RGPD Espagne, React 19)...',
+      send: 'Envoyer la Question',
+      clear: 'Réinitialiser',
+      minimize: 'Réduire',
+      suggestedTitle: 'Questions d’Architecture Recommandées',
+      suggestedPrompts: [
+        'Comment garantir un TTFB < 50ms et un score Lighthouse 99+ en B2B ?',
+        'Quelles sont les obligations strictes LSSI/RGPD en Espagne pour la capture de leads ?',
+        'Quelle architecture pour intégrer des agents IA privés sans fuite de données ?',
+        'Vite + React 19 vs Next.js pour un portail client haute conversion ?'
+      ],
+      bookAudit: 'Réserver un Audit Technique de Faisabilité',
+      thinkingText: 'Analyse de l’architecture via Gemini 3.8 Flash...',
+      disclaimer: 'Orientation architecturale en temps réel propulsée par Gemini 3.8 Flash. Alignée sur les normes d’ingénierie AURA Digital.',
+      errorMsg: 'Impossible de contacter le service d’architecture. Veuillez vérifier votre connexion et réessayer.',
+      retry: 'Réessayer'
     },
   },
 };
