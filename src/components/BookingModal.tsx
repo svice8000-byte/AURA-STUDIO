@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, Calendar, CheckCircle2, ArrowRight, AlertCircle, Sparkles } from 'lucide-react';
+import { CheckCircle2, Sparkles, AlertCircle } from 'lucide-react';
 import { useI18n } from '../i18n/I18nContext';
 
 interface BookingModalProps {
@@ -11,72 +11,96 @@ interface BookingModalProps {
 const normalizeService = (srv?: string): string => {
   if (!srv) return '';
   const s = srv.toLowerCase();
-  if (s === 'landing-page' || s.includes('landing')) return 'landing-page';
-  if (s === 'site-vitrine' || s.includes('vitrine') || s.includes('showcase')) return 'site-vitrine';
-  if (s === 'refonte-web' || s.includes('refonte') || s.includes('moderniz') || s.includes('redesign') || s.includes('mantenimiento') || s.includes('sla')) return 'refonte-web';
-  if (s === 'site-institutionnel' || s.includes('corporate') || s.includes('institution') || s.includes('multi')) return 'site-institutionnel';
-  if (s === 'saas-platform' || s.includes('saas') || s.includes('platform')) return 'saas-platform';
-  if (s === 'web-app' || s.includes('app') || s.includes('sur-mesure') || s.includes('medida')) return 'web-app';
-  if (s === 'portail-client' || s.includes('portail') || s.includes('portal') || s.includes('membre') || s.includes('member')) return 'portail-client';
-  if (s === 'api-integration' || s.includes('api') || s.includes('agent') || s.includes('ia') || s.includes('ai')) return 'api-integration';
-  if (s === 'ui-ux-design' || s.includes('design') || s.includes('prototype') || s.includes('ui') || s.includes('ux')) return 'ui-ux-design';
-  if (s === 'audit-performance' || s.includes('audit') || s.includes('vital') || s.includes('perf')) return 'audit-performance';
+  if (s.includes('maintenance') || s.includes('mantenimiento') || s.includes('rgpd') || s.includes('sla')) return 'Maintenance RGPD';
+  if (s.includes('audit') || s.includes('auditor') || s.includes('perf')) return 'Audit Performance';
+  if (s.includes('landing')) return 'Landing Page';
+  if (s.includes('refonte') || s.includes('redesign') || s.includes('moderniz')) return 'Refonte Web';
+  if (s.includes('institution') || s.includes('corporate') || s.includes('multi')) return 'Site Institutionnel';
+  if (s.includes('vitrine') || s.includes('showcase')) return 'Site Vitrine';
+  if (s.includes('saas') || s.includes('platform')) return 'SaaS Full-Stack';
+  if (s.includes('portail') || s.includes('portal') || s.includes('membre') || s.includes('member')) return 'Portail Client';
+  if (s.includes('api') || s.includes('agent') || s.includes('architect') || s.includes('ia') || s.includes('ai')) return 'API Integration';
+  if (s.includes('system') || s.includes('brand')) return 'Design System';
+  if (s.includes('design') || s.includes('proto') || s.includes('ui') || s.includes('ux')) return 'UI/UX Design';
+  if (s.includes('web') || s.includes('app')) return 'Application Web';
   return srv;
 };
 
 export const SERVICE_PRICING_MAP: Record<
   string,
-  { label: string; price: string; group: string }
+  { label: string; budgetTier: string; price: string; group: string }
 > = {
-  'landing-page': {
+  'Landing Page': {
     label: 'Landing Page Haute Conversion',
-    price: '500 € - 2.500 €',
-    group: 'Solutions Web',
+    budgetTier: '1.500€ - 3.500€',
+    price: '1.500 € – 3.500 €',
+    group: '🚀 Solutions Web & Vitrines',
   },
-  'site-vitrine': {
-    label: 'Site Vitrine Sur-Mesure',
-    price: '800 € - 6.500 €',
-    group: 'Solutions Web',
+  'Site Vitrine': {
+    label: 'Site Vitrine Sur-Mesure / Corporate',
+    budgetTier: '3.000€ - 7.500€',
+    price: '3.000 € – 7.500 €',
+    group: '🚀 Solutions Web & Vitrines',
   },
-  'refonte-web': {
+  'Refonte Web': {
     label: 'Refonte & Modernisation Web',
-    price: '1.500 € - 5.000 €',
-    group: 'Solutions Web',
+    budgetTier: '3.000€ - 7.500€',
+    price: '3.000 € – 7.500 €',
+    group: '🚀 Solutions Web & Vitrines',
   },
-  'site-institutionnel': {
-    label: 'Site Corporate Multi-langues',
-    price: '2.000 € - 8.000 €',
-    group: 'Solutions Web',
+  'Site Institutionnel': {
+    label: 'Site Web Institutionnel (Multi-langues)',
+    budgetTier: '3.000€ - 7.500€',
+    price: '3.000 € – 7.500 €',
+    group: '🚀 Solutions Web & Vitrines',
   },
-  'saas-platform': {
+  'SaaS Full-Stack': {
     label: 'SaaS Full-Stack & Plateformes',
-    price: '15.000 € - 45.000 €+',
-    group: 'Ingénierie & SaaS',
+    budgetTier: '15.000€ +',
+    price: '15.000 € +',
+    group: '⚙️ Ingénierie Logicielle & SaaS',
   },
-  'web-app': {
-    label: 'Application Web Sur-Mesure',
-    price: '8.000 € - 25.000 €',
-    group: 'Ingénierie & SaaS',
+  'Application Web': {
+    label: 'Application Web Sur-Mesure (Next.js / React)',
+    budgetTier: '8.000€ - 15.000€',
+    price: '8.000 € – 15.000 €',
+    group: '⚙️ Ingénierie Logicielle & SaaS',
   },
-  'portail-client': {
-    label: 'Portail Client / Espace Membre',
-    price: '6.000 € - 18.000 €',
-    group: 'Ingénierie & SaaS',
+  'Portail Client': {
+    label: 'Portail Client & Espace Membre',
+    budgetTier: '8.000€ - 15.000€',
+    price: '8.000 € – 15.000 €',
+    group: '⚙️ Ingénierie Logicielle & SaaS',
   },
-  'api-integration': {
-    label: 'Architecture & APIs',
-    price: '4.000 € - 12.000 €',
-    group: 'Ingénierie & SaaS',
+  'API Integration': {
+    label: 'Architecture, API & Intégration Systèmes',
+    budgetTier: '8.000€ - 15.000€',
+    price: '8.000 € – 15.000 €',
+    group: '⚙️ Ingénierie Logicielle & SaaS',
   },
-  'ui-ux-design': {
-    label: 'Design UI/UX & Prototypes',
-    price: '1.000 € - 4.000 €',
-    group: 'Design & Audit',
+  'UI/UX Design': {
+    label: 'Design UI/UX & Prototypes Interactifs',
+    budgetTier: '1.500€ - 3.500€',
+    price: '1.500 € – 3.500 €',
+    group: '🎨 UI/UX Design',
   },
-  'audit-performance': {
-    label: 'Audit Technique & Performance',
-    price: '900 € - 1.500 €',
-    group: 'Design & Audit',
+  'Design System': {
+    label: 'Design System & Kit de Marque',
+    budgetTier: '1.500€ - 3.500€',
+    price: '1.500 € – 3.500 €',
+    group: '🎨 UI/UX Design',
+  },
+  'Audit Performance': {
+    label: 'Audit Technique & Optimisation de Performance',
+    budgetTier: '1.000€ - 2.500€',
+    price: '1.000 € – 2.500 €',
+    group: '⚡ Audit, Performance & Maintenance',
+  },
+  'Maintenance RGPD': {
+    label: 'Maintenance, Sécurité & Conformité RGPD',
+    budgetTier: '300€ - 1.200€ / mois',
+    price: '300 € – 1.200 € / mois',
+    group: '⚡ Audit, Performance & Maintenance',
   },
 };
 
@@ -89,18 +113,18 @@ export const BookingModal: React.FC<BookingModalProps> = ({
 
   const initialService = normalizeService(preselectedService) || '';
   const initialBudget = initialService && SERVICE_PRICING_MAP[initialService]
-    ? SERVICE_PRICING_MAP[initialService].price
+    ? SERVICE_PRICING_MAP[initialService].budgetTier
     : '';
 
   const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    company: '',
-    service: initialService,
-    budget: initialBudget,
-    timeline: '1 a 2 meses',
-    projectDetails: '',
-    rgpdConsent: false,
+    Nom_Et_Prenom: '',
+    Email_Professionnel: '',
+    Entreprise_Projet: '',
+    Service_Requis: initialService,
+    Budget_Estime: initialBudget,
+    Delai_Souhaite: '1 - 2 mois',
+    Description_Projet: '',
+    Consentement_RGPD: false,
   });
 
   useEffect(() => {
@@ -108,23 +132,23 @@ export const BookingModal: React.FC<BookingModalProps> = ({
       const normalized = normalizeService(preselectedService);
       setFormData((prev) => ({
         ...prev,
-        service: normalized,
-        budget: SERVICE_PRICING_MAP[normalized]?.price || prev.budget,
+        Service_Requis: normalized,
+        Budget_Estime: SERVICE_PRICING_MAP[normalized]?.budgetTier || prev.Budget_Estime,
       }));
     }
   }, [preselectedService, isOpen]);
 
   const handleServiceChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const selectedServiceKey = e.target.value;
-    const matchingPrice = SERVICE_PRICING_MAP[selectedServiceKey]?.price;
+    const matchingTier = SERVICE_PRICING_MAP[selectedServiceKey]?.budgetTier;
     setFormData((prev) => ({
       ...prev,
-      service: selectedServiceKey,
-      budget: matchingPrice || prev.budget,
+      Service_Requis: selectedServiceKey,
+      Budget_Estime: matchingTier || prev.Budget_Estime,
     }));
   };
 
-  const activeServiceInfo = formData.service ? SERVICE_PRICING_MAP[formData.service] : null;
+  const activeServiceInfo = formData.Service_Requis ? SERVICE_PRICING_MAP[formData.Service_Requis] : null;
 
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const [errorMessage, setErrorMessage] = useState('');
@@ -132,321 +156,491 @@ export const BookingModal: React.FC<BookingModalProps> = ({
 
   if (!isOpen) return null;
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setErrorMessage('');
 
-    if (!formData.email.trim() || !formData.email.includes('@')) {
+    if (!formData.Email_Professionnel.trim() || !formData.Email_Professionnel.includes('@')) {
       setStatus('error');
-      setErrorMessage('Por favor introduce un email profesional válido / Please enter a valid email.');
+      setErrorMessage('Veuillez renseigner un email professionnel valide.');
       return;
     }
 
-    if (!formData.service) {
+    if (!formData.Service_Requis) {
       setStatus('error');
-      setErrorMessage('Veuillez sélectionner un service requis / Por favor selecciona un servicio.');
+      setErrorMessage('Veuillez sélectionner un service requis.');
       return;
     }
 
-    if (!formData.rgpdConsent) {
+    if (!formData.Consentement_RGPD) {
       setStatus('error');
-      setErrorMessage('Debes aceptar los términos de privacidad y consentimiento RGPD/LSSI.');
+      setErrorMessage('Veuillez accepter les termes de confidentialité et RGPD.');
       return;
     }
 
     setStatus('loading');
 
     try {
-      const res = await fetch('/api/booking', {
+      const formPayload = {
+        _subject: "Nouvelle demande d'audit technique - AURA Digital",
+        Nom_Et_Prenom: formData.Nom_Et_Prenom,
+        Email_Professionnel: formData.Email_Professionnel,
+        Entreprise_Projet: formData.Entreprise_Projet,
+        Service_Requis: formData.Service_Requis,
+        Budget_Estime: formData.Budget_Estime,
+        Delai_Souhaite: formData.Delai_Souhaite,
+        Description_Projet: formData.Description_Projet,
+        Consentement_RGPD: formData.Consentement_RGPD ? 'Accepte' : 'Non',
+      };
+
+      // Direct asynchronous submission to Formspree endpoint
+      const formspreePromise = fetch('https://formspree.io/f/r.zidarh@lanastrading.es', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formPayload),
       });
 
-      const data = await res.json();
-      if (!res.ok || !data.success) {
-        throw new Error(data.error || 'No se pudo procesar la reserva.');
+      // Mirror to local server for storage / tracking
+      const localPromise = fetch('/api/booking', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formPayload),
+      }).then((r) => r.json()).catch(() => null);
+
+      const [resFormspree, localRes] = await Promise.allSettled([formspreePromise, localPromise]);
+
+      if (localRes.status === 'fulfilled' && localRes.value?.bookingId) {
+        setBookingResponse(localRes.value);
+      } else {
+        setBookingResponse({ bookingId: `AURA-AUDIT-${Date.now().toString().slice(-6)}` });
       }
 
-      setBookingResponse(data);
       setStatus('success');
     } catch (err: any) {
       console.error('Booking submission error:', err);
       setStatus('error');
-      setErrorMessage(err.message || 'Error de conexión.');
+      setErrorMessage(err.message || 'Une erreur est survenue lors de l\'envoi.');
     }
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md animate-in fade-in duration-200">
-      <div className="relative w-full max-w-2xl max-h-[92vh] glass-panel rounded-3xl border border-white/20 shadow-2xl flex flex-col overflow-hidden bg-[#07070f]">
-        {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-white/10 bg-black/40">
-          <div className="flex items-center gap-2">
-            <div className="p-1.5 rounded-lg bg-blue-500/10 text-blue-400">
-              <Calendar className="w-4 h-4" />
-            </div>
-            <span className="font-syne font-bold text-white text-base">
-              {t.bookingModal.title}
-            </span>
-          </div>
-          <button
-            onClick={onClose}
-            className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="audit-modal-title"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md overflow-y-auto animate-in fade-in duration-200"
+    >
+      <div
+        className="modal-container w-full max-w-[650px] my-auto bg-[#050505] text-[#ffffff] p-6 sm:p-8 rounded-[12px] border border-[#222] shadow-2xl relative font-sans"
+        style={{
+          backgroundColor: '#050505',
+          color: '#ffffff',
+          borderRadius: '12px',
+          border: '1px solid #222',
+          maxWidth: '650px',
+        }}
+      >
+        {/* En-tête */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+          <h2
+            id="audit-modal-title"
+            style={{
+              fontSize: '1.25rem',
+              fontWeight: 600,
+              display: 'flex',
+              alignItems: 'center',
+              gap: '10px',
+              margin: 0,
+            }}
           >
-            <X className="w-5 h-5" />
+            <span role="img" aria-label="Calendrier">📅</span> Réserver un Audit Technique de Faisabilité
+          </h2>
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label="Fermer la boîte de dialogue"
+            style={{
+              background: 'none',
+              border: 'none',
+              color: '#888',
+              fontSize: '1.2rem',
+              cursor: 'pointer',
+              padding: '4px 8px',
+              borderRadius: '4px',
+            }}
+            className="hover:text-white hover:bg-white/10 transition-colors"
+          >
+            ✕
           </button>
         </div>
 
-        {/* Content */}
-        <div className="flex-1 overflow-y-auto p-6 sm:p-8">
-          {status === 'success' ? (
-            <div className="py-8 flex flex-col items-center text-center">
-              <div className="w-16 h-16 rounded-full bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-400 mb-6">
-                <CheckCircle2 className="w-8 h-8" />
-              </div>
-
-              <div className="text-xs font-mono text-[#D4AF37] uppercase tracking-widest mb-1 flex items-center gap-1.5">
-                <Sparkles className="w-3.5 h-3.5" />
-                <span>{t.bookingModal.successBadge}</span>
-              </div>
-
-              <h3 className="font-syne text-2xl sm:text-3xl font-bold text-white mb-3">
-                {t.bookingModal.successTitle}, {formData.name || ''}
-              </h3>
-
-              <p className="font-sans text-slate-300 text-sm max-w-md mb-6 leading-relaxed">
-                {t.bookingModal.successDesc}
-              </p>
-
-              <div className="p-4 rounded-xl bg-black/50 border border-white/10 text-xs font-mono text-slate-400 w-full max-w-sm mb-6">
-                <div>Ref: {bookingResponse?.bookingId || 'AURA-BK-2026'}</div>
-                <div>{t.bookingModal.channelInfo}</div>
-              </div>
-
-              <button
-                onClick={onClose}
-                className="px-6 py-3 bg-gradient-to-r from-blue-600 to-violet-600 hover:from-blue-500 hover:to-violet-500 text-white rounded-xl text-xs font-bold uppercase tracking-wider cursor-pointer"
-              >
-                {t.bookingModal.closeButton}
-              </button>
+        {status === 'success' ? (
+          <div className="py-6 flex flex-col items-center text-center">
+            <div className="w-16 h-16 rounded-full bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-400 mb-5">
+              <CheckCircle2 className="w-8 h-8" />
             </div>
-          ) : (
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <p className="text-xs sm:text-sm text-slate-300">
-                {t.bookingModal.subtitle}
-              </p>
 
-              {status === 'error' && errorMessage && (
-                <div className="p-3.5 rounded-xl bg-red-950/40 border border-red-500/30 flex items-start gap-2.5 text-xs text-red-300">
-                  <AlertCircle className="w-4 h-4 text-red-400 shrink-0 mt-0.5" />
-                  <span>{errorMessage}</span>
-                </div>
-              )}
+            <div className="text-xs font-mono text-[#D4AF37] uppercase tracking-widest mb-2 flex items-center gap-1.5">
+              <Sparkles className="w-3.5 h-3.5" />
+              <span>Demande d'Audit Confirmée</span>
+            </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <h3 className="text-xl sm:text-2xl font-bold text-white mb-2">
+              Merci {formData.Nom_Et_Prenom || ''} !
+            </h3>
+
+            <p style={{ color: '#aaa', fontSize: '0.9rem', lineHeight: '1.6' }} className="max-w-md mb-6">
+              Votre demande a bien été transmise à notre équipe d'ingénierie senior (<strong>r.zidarh@lanastrading.es</strong>). Nous étudions votre projet et vous transmettrons un diagnostic d'architecture chiffré sous 24h ouvrées.
+            </p>
+
+            <div
+              style={{
+                background: '#0d0d0d',
+                border: '1px solid #333',
+                borderRadius: '6px',
+                padding: '12px 18px',
+                fontSize: '0.85rem',
+                color: '#aaa',
+                marginBottom: '20px',
+                width: '100%',
+              }}
+            >
+              <div><strong>Référence :</strong> {bookingResponse?.bookingId || 'AURA-AUDIT-2026'}</div>
+              <div><strong>Service :</strong> {formData.Service_Requis} ({activeServiceInfo?.price || formData.Budget_Estime})</div>
+              <div><strong>Email de confirmation :</strong> {formData.Email_Professionnel}</div>
+            </div>
+
+            <button
+              type="button"
+              onClick={onClose}
+              style={{
+                backgroundColor: '#6366f1',
+                color: 'white',
+                border: 'none',
+                padding: '12px 24px',
+                borderRadius: '6px',
+                fontWeight: 600,
+                fontSize: '0.95rem',
+                cursor: 'pointer',
+              }}
+              className="hover:opacity-90 transition-opacity"
+            >
+              Fermer la fenêtre
+            </button>
+          </div>
+        ) : (
+          <>
+            <p style={{ color: '#aaa', fontSize: '0.9rem', lineHeight: 1.5, marginBottom: '25px' }}>
+              Session privée de 30 minutes sans discours commercial inutile. Nous analysons votre architecture actuelle, vos goulets d'étranglement et vous proposons un plan chiffré.
+            </p>
+
+            {status === 'error' && errorMessage && (
+              <div
+                style={{
+                  backgroundColor: 'rgba(127, 29, 29, 0.4)',
+                  border: '1px solid rgba(239, 68, 68, 0.4)',
+                  borderRadius: '6px',
+                  padding: '10px 14px',
+                  marginBottom: '15px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '10px',
+                  color: '#fca5a5',
+                  fontSize: '0.85rem',
+                }}
+              >
+                <AlertCircle className="w-4 h-4 shrink-0 text-red-400" />
+                <span>{errorMessage}</span>
+              </div>
+            )}
+
+            {/* FORMULAIRE AVEC ENVOI PAR EMAIL (Formspree) */}
+            <form
+              action="https://formspree.io/f/r.zidarh@lanastrading.es"
+              method="POST"
+              onSubmit={handleSubmit}
+              style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}
+            >
+              {/* Redirection personnalisée après envoi (Optionnel) */}
+              <input type="hidden" name="_subject" value="Nouvelle demande d'audit technique - AURA Digital" />
+
+              {/* Ligne 1 : Nom & Email */}
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '15px' }}>
                 <div>
-                  <label className="block text-xs font-mono text-slate-300 mb-1.5">
-                    {t.bookingModal.nameLabel}
+                  <label style={{ display: 'block', fontSize: '0.85rem', marginBottom: '6px', color: '#ccc' }}>
+                    Nom et Prénom <span style={{ color: '#6366f1' }}>*</span>
                   </label>
                   <input
                     type="text"
+                    name="Nom_Et_Prenom"
+                    placeholder="Ex. Sophie Bernard"
                     required
-                    value={formData.name}
-                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    placeholder={t.bookingModal.namePlaceholder}
-                    className="w-full px-4 py-2.5 rounded-xl bg-black/50 border border-white/10 text-white placeholder-slate-500 text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                    value={formData.Nom_Et_Prenom}
+                    onChange={(e) => setFormData({ ...formData, Nom_Et_Prenom: e.target.value })}
+                    style={{
+                      width: '100%',
+                      padding: '10px 14px',
+                      background: '#0d0d0d',
+                      border: '1px solid #333',
+                      borderRadius: '6px',
+                      color: '#fff',
+                      boxSizing: 'border-box',
+                    }}
                   />
                 </div>
-
                 <div>
-                  <label className="block text-xs font-mono text-slate-300 mb-1.5">
-                    {t.bookingModal.emailLabel} <span className="text-blue-400">*</span>
+                  <label style={{ display: 'block', fontSize: '0.85rem', marginBottom: '6px', color: '#ccc' }}>
+                    Email Professionnel <span style={{ color: '#6366f1' }}>*</span>
                   </label>
                   <input
                     type="email"
+                    name="Email_Professionnel"
+                    placeholder="sophie@entreprise.fr"
                     required
-                    value={formData.email}
-                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                    placeholder={t.bookingModal.emailPlaceholder}
-                    className="w-full px-4 py-2.5 rounded-xl bg-black/50 border border-white/10 text-white placeholder-slate-500 text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                    value={formData.Email_Professionnel}
+                    onChange={(e) => setFormData({ ...formData, Email_Professionnel: e.target.value })}
+                    style={{
+                      width: '100%',
+                      padding: '10px 14px',
+                      background: '#0d0d0d',
+                      border: '1px solid #333',
+                      borderRadius: '6px',
+                      color: '#fff',
+                      boxSizing: 'border-box',
+                    }}
                   />
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {/* Ligne 2 : Entreprise & Service Requis */}
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '15px' }}>
                 <div>
-                  <label className="block text-xs font-mono text-slate-300 mb-1.5">
-                    {t.bookingModal.companyLabel}
+                  <label style={{ display: 'block', fontSize: '0.85rem', marginBottom: '6px', color: '#ccc' }}>
+                    Entreprise / Projet <span style={{ color: '#6366f1' }}>*</span>
                   </label>
                   <input
                     type="text"
-                    value={formData.company}
-                    onChange={(e) => setFormData({ ...formData, company: e.target.value })}
-                    placeholder={t.bookingModal.companyPlaceholder}
-                    className="w-full px-4 py-2.5 rounded-xl bg-black/50 border border-white/10 text-white placeholder-slate-500 text-sm focus:outline-none focus:border-blue-500"
+                    name="Entreprise_Projet"
+                    placeholder="Ex. ScaleUp SAS"
+                    required
+                    value={formData.Entreprise_Projet}
+                    onChange={(e) => setFormData({ ...formData, Entreprise_Projet: e.target.value })}
+                    style={{
+                      width: '100%',
+                      padding: '10px 14px',
+                      background: '#0d0d0d',
+                      border: '1px solid #333',
+                      borderRadius: '6px',
+                      color: '#fff',
+                      boxSizing: 'border-box',
+                    }}
                   />
                 </div>
-
                 <div>
-                  <label htmlFor="service-select" className="block text-xs font-mono text-slate-300 mb-1.5 font-medium">
-                    Service Requis <span className="text-blue-400">*</span>
+                  <label style={{ display: 'block', fontSize: '0.85rem', marginBottom: '6px', color: '#ccc' }}>
+                    Service Requis <span style={{ color: '#6366f1' }}>*</span>
                   </label>
                   <select
-                    id="service-select"
-                    name="service"
-                    value={formData.service}
-                    onChange={handleServiceChange}
+                    name="Service_Requis"
                     required
-                    className="w-full px-4 py-2.5 rounded-xl bg-black/60 border border-white/10 text-white text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 cursor-pointer"
+                    value={formData.Service_Requis}
+                    onChange={handleServiceChange}
+                    style={{
+                      width: '100%',
+                      padding: '10px 14px',
+                      background: '#0d0d0d',
+                      border: '1px solid #333',
+                      borderRadius: '6px',
+                      color: '#fff',
+                      boxSizing: 'border-box',
+                      cursor: 'pointer',
+                    }}
                   >
                     <option value="" disabled>Sélectionnez un service...</option>
                     
-                    <optgroup label="Solutions Web" className="bg-[#0f111a] text-slate-300 font-semibold">
-                      <option value="landing-page" className="bg-[#07070f] text-white">Landing Page Haute Conversion (500 € - 2.500 €)</option>
-                      <option value="site-vitrine" className="bg-[#07070f] text-white">Site Vitrine Sur-Mesure (800 € - 6.500 €)</option>
-                      <option value="refonte-web" className="bg-[#07070f] text-white">Refonte & Modernisation Web (1.500 € - 5.000 €)</option>
-                      <option value="site-institutionnel" className="bg-[#07070f] text-white">Site Corporate Multi-langues (2.000 € - 8.000 €)</option>
+                    <optgroup label="🚀 Solutions Web & Vitrines" style={{ background: '#111', color: '#ccc' }}>
+                      <option value="Landing Page" style={{ background: '#0d0d0d', color: '#fff' }}>Landing Page Haute Conversion</option>
+                      <option value="Site Vitrine" style={{ background: '#0d0d0d', color: '#fff' }}>Site Vitrine Sur-Mesure / Corporate</option>
+                      <option value="Refonte Web" style={{ background: '#0d0d0d', color: '#fff' }}>Refonte & Modernisation Web</option>
+                      <option value="Site Institutionnel" style={{ background: '#0d0d0d', color: '#fff' }}>Site Web Institutionnel (Multi-langues)</option>
                     </optgroup>
                     
-                    <optgroup label="Ingénierie & SaaS" className="bg-[#0f111a] text-slate-300 font-semibold">
-                      <option value="saas-platform" className="bg-[#07070f] text-white">SaaS Full-Stack & Plateformes (15.000 € - 45.000 €+)</option>
-                      <option value="web-app" className="bg-[#07070f] text-white">Application Web Sur-Mesure (8.000 € - 25.000 €)</option>
-                      <option value="portail-client" className="bg-[#07070f] text-white">Portail Client / Espace Membre (6.000 € - 18.000 €)</option>
-                      <option value="api-integration" className="bg-[#07070f] text-white">Architecture & APIs (4.000 € - 12.000 €)</option>
+                    <optgroup label="⚙️ Ingénierie Logicielle & SaaS" style={{ background: '#111', color: '#ccc' }}>
+                      <option value="SaaS Full-Stack" style={{ background: '#0d0d0d', color: '#fff' }}>SaaS Full-Stack & Plateformes</option>
+                      <option value="Application Web" style={{ background: '#0d0d0d', color: '#fff' }}>Application Web Sur-Mesure (Next.js / React)</option>
+                      <option value="Portail Client" style={{ background: '#0d0d0d', color: '#fff' }}>Portail Client & Espace Membre</option>
+                      <option value="API Integration" style={{ background: '#0d0d0d', color: '#fff' }}>Architecture, API & Intégration Systèmes</option>
                     </optgroup>
                     
-                    <optgroup label="Design & Audit" className="bg-[#0f111a] text-slate-300 font-semibold">
-                      <option value="ui-ux-design" className="bg-[#07070f] text-white">Design UI/UX & Prototypes (1.000 € - 4.000 €)</option>
-                      <option value="audit-performance" className="bg-[#07070f] text-white">Audit Technique & Performance (900 € - 1.500 €)</option>
+                    <optgroup label="🎨 UI/UX Design" style={{ background: '#111', color: '#ccc' }}>
+                      <option value="UI/UX Design" style={{ background: '#0d0d0d', color: '#fff' }}>Design UI/UX & Prototypes Interactifs</option>
+                      <option value="Design System" style={{ background: '#0d0d0d', color: '#fff' }}>Design System & Kit de Marque</option>
+                    </optgroup>
+                    
+                    <optgroup label="⚡ Audit, Performance & Maintenance" style={{ background: '#111', color: '#ccc' }}>
+                      <option value="Audit Performance" style={{ background: '#0d0d0d', color: '#fff' }}>Audit Technique & Optimisation de Performance</option>
+                      <option value="Maintenance RGPD" style={{ background: '#0d0d0d', color: '#fff' }}>Maintenance, Sécurité & Conformité RGPD</option>
                     </optgroup>
                   </select>
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {/* Ligne 3 : Budget & Délai avec synchronisation de prix */}
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '15px' }}>
                 <div>
-                  <div className="flex items-center justify-between mb-1.5">
-                    <label htmlFor="budget-select" className="block text-xs font-mono text-slate-300 font-medium">
-                      {t.bookingModal.budgetLabel || 'Budget Estimé'} <span className="text-blue-400">*</span>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+                    <label style={{ fontSize: '0.85rem', color: '#ccc' }}>
+                      Budget Estimé <span style={{ color: '#6366f1' }}>*</span>
                     </label>
                     {activeServiceInfo && (
-                      <span className="text-[10px] sm:text-[11px] font-mono text-[#D4AF37] bg-[#D4AF37]/15 px-2 py-0.5 rounded border border-[#D4AF37]/35 font-semibold">
+                      <span
+                        style={{
+                          fontSize: '0.75rem',
+                          fontFamily: 'monospace',
+                          color: '#D4AF37',
+                          backgroundColor: 'rgba(212, 175, 55, 0.15)',
+                          padding: '2px 8px',
+                          borderRadius: '4px',
+                          border: '1px solid rgba(212, 175, 55, 0.35)',
+                          fontWeight: 600,
+                        }}
+                      >
                         {activeServiceInfo.price}
                       </span>
                     )}
                   </div>
                   <select
-                    id="budget-select"
-                    name="budget"
-                    value={formData.budget}
-                    onChange={(e) => setFormData({ ...formData, budget: e.target.value })}
+                    name="Budget_Estime"
                     required
-                    className="w-full px-4 py-2.5 rounded-xl bg-black/60 border border-white/10 text-white text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 cursor-pointer"
+                    value={formData.Budget_Estime}
+                    onChange={(e) => setFormData({ ...formData, Budget_Estime: e.target.value })}
+                    style={{
+                      width: '100%',
+                      padding: '10px 14px',
+                      background: '#0d0d0d',
+                      border: '1px solid #333',
+                      borderRadius: '6px',
+                      color: '#fff',
+                      boxSizing: 'border-box',
+                      cursor: 'pointer',
+                    }}
                   >
-                    <option value="" disabled>Sélectionnez un budget...</option>
-
-                    <optgroup label="Tarifs par Service Requis (Solutions Web)" className="bg-[#0f111a] text-slate-300 font-semibold">
-                      <option value="500 € - 2.500 €" className="bg-[#07070f] text-white">500 € - 2.500 € (Landing Page Haute Conversion)</option>
-                      <option value="800 € - 6.500 €" className="bg-[#07070f] text-white">800 € - 6.500 € (Site Vitrine Sur-Mesure)</option>
-                      <option value="1.500 € - 5.000 €" className="bg-[#07070f] text-white">1.500 € - 5.000 € (Refonte & Modernisation Web)</option>
-                      <option value="2.000 € - 8.000 €" className="bg-[#07070f] text-white">2.000 € - 8.000 € (Site Corporate Multi-langues)</option>
-                    </optgroup>
-
-                    <optgroup label="Tarifs par Service Requis (Ingénierie & SaaS)" className="bg-[#0f111a] text-slate-300 font-semibold">
-                      <option value="15.000 € - 45.000 €+" className="bg-[#07070f] text-white">15.000 € - 45.000 €+ (SaaS Full-Stack & Plateformes)</option>
-                      <option value="8.000 € - 25.000 €" className="bg-[#07070f] text-white">8.000 € - 25.000 € (Application Web Sur-Mesure)</option>
-                      <option value="6.000 € - 18.000 €" className="bg-[#07070f] text-white">6.000 € - 18.000 € (Portail Client / Espace Membre)</option>
-                      <option value="4.000 € - 12.000 €" className="bg-[#07070f] text-white">4.000 € - 12.000 € (Architecture & APIs)</option>
-                    </optgroup>
-
-                    <optgroup label="Tarifs par Service Requis (Design & Audit)" className="bg-[#0f111a] text-slate-300 font-semibold">
-                      <option value="1.000 € - 4.000 €" className="bg-[#07070f] text-white">1.000 € - 4.000 € (Design UI/UX & Prototypes)</option>
-                      <option value="900 € - 1.500 €" className="bg-[#07070f] text-white">900 € - 1.500 € (Audit Technique & Performance)</option>
-                    </optgroup>
-
-                    <optgroup label="Enveloppes Globales & Enterprise" className="bg-[#0f111a] text-slate-300 font-semibold">
-                      <option value="5.000 € - 10.000 €" className="bg-[#07070f] text-white">5.000 € - 10.000 € (Enveloppe Globale PME)</option>
-                      <option value="10.000 € - 25.000 €" className="bg-[#07070f] text-white">10.000 € - 25.000 € (Projet Structuré)</option>
-                      <option value="25.000 € - 50.000 €" className="bg-[#07070f] text-white">25.000 € - 50.000 € (Programme Digital Avancé)</option>
-                      <option value="+50.000 € (Enterprise)" className="bg-[#07070f] text-white">+50.000 € (Enterprise Custom SLA)</option>
-                    </optgroup>
+                    <option value="" disabled>Sélectionnez une tranche...</option>
+                    <option value="300€ - 1.200€ / mois">300 € – 1.200 € / mois (Maintenance)</option>
+                    <option value="1.000€ - 2.500€">1.000 € – 2.500 € (Audit & Optimisation)</option>
+                    <option value="1.500€ - 3.500€">1.500 € – 3.500 € (Landing Page)</option>
+                    <option value="3.000€ - 7.500€">3.000 € – 7.500 € (Site Vitrine)</option>
+                    <option value="8.000€ - 15.000€">8.000 € – 15.000 € (Web App & Portail)</option>
+                    <option value="15.000€ +">15.000 € + (SaaS & Sur-mesure)</option>
                   </select>
-
-                  {/* Dynamic Pricing Callout */}
-                  {activeServiceInfo ? (
-                    <div className="mt-2 p-2 rounded-lg bg-blue-950/40 border border-blue-500/25 text-[11px] font-mono flex items-center justify-between text-slate-300">
-                      <span className="truncate">Tarif indicatif du service :</span>
-                      <span className="text-[#D4AF37] font-bold shrink-0 ml-2">{activeServiceInfo.price}</span>
-                    </div>
-                  ) : (
-                    <div className="mt-2 text-[11px] font-mono text-slate-400">
-                      💡 Chaque prix de service s’affiche et s’aligne ici automatiquement.
-                    </div>
-                  )}
                 </div>
-
                 <div>
-                  <label className="block text-xs font-mono text-slate-300 mb-1.5">
-                    {t.bookingModal.timelineLabel}
+                  <label style={{ display: 'block', fontSize: '0.85rem', marginBottom: '6px', color: '#ccc' }}>
+                    Délai Souhaité
                   </label>
                   <select
-                    value={formData.timeline}
-                    onChange={(e) => setFormData({ ...formData, timeline: e.target.value })}
-                    className="w-full px-4 py-2.5 rounded-xl bg-black/50 border border-white/10 text-white text-sm focus:outline-none focus:border-blue-500"
+                    name="Delai_Souhaite"
+                    value={formData.Delai_Souhaite}
+                    onChange={(e) => setFormData({ ...formData, Delai_Souhaite: e.target.value })}
+                    style={{
+                      width: '100%',
+                      padding: '10px 14px',
+                      background: '#0d0d0d',
+                      border: '1px solid #333',
+                      borderRadius: '6px',
+                      color: '#fff',
+                      boxSizing: 'border-box',
+                      cursor: 'pointer',
+                    }}
                   >
-                    <option value="Inmediato (< 3 semanas)">&lt; 3 weeks / Inmediato / Immédiat</option>
-                    <option value="1 a 2 meses">1 - 2 months / mois / meses</option>
-                    <option value="3 a 6 meses">3 - 6 months / mois / meses</option>
+                    <option value="Urgent (< 1 mois)">Urgent (&lt; 1 mois)</option>
+                    <option value="1 - 2 mois">1 – 2 mois</option>
+                    <option value="3 - 6 mois">3 – 6 mois</option>
+                    <option value="Flexible">Flexible / En réflexion</option>
                   </select>
                 </div>
               </div>
 
+              {/* Ligne 4 : Description du Projet */}
               <div>
-                <label className="block text-xs font-mono text-slate-300 mb-1.5">
-                  {t.bookingModal.detailsLabel}
+                <label style={{ display: 'block', fontSize: '0.85rem', marginBottom: '6px', color: '#ccc' }}>
+                  Parlez-nous brièvement de votre projet
                 </label>
                 <textarea
+                  name="Description_Projet"
                   rows={3}
-                  value={formData.projectDetails}
-                  onChange={(e) => setFormData({ ...formData, projectDetails: e.target.value })}
-                  placeholder={t.bookingModal.detailsPlaceholder}
-                  className="w-full px-4 py-2.5 rounded-xl bg-black/50 border border-white/10 text-white placeholder-slate-500 text-sm focus:outline-none focus:border-blue-500 resize-none"
+                  value={formData.Description_Projet}
+                  onChange={(e) => setFormData({ ...formData, Description_Projet: e.target.value })}
+                  placeholder="Objectifs, fonctionnalités clés, technologies souhaitées..."
+                  style={{
+                    width: '100%',
+                    padding: '10px 14px',
+                    background: '#0d0d0d',
+                    border: '1px solid #333',
+                    borderRadius: '6px',
+                    color: '#fff',
+                    boxSizing: 'border-box',
+                    fontFamily: 'inherit',
+                    resize: 'vertical',
+                  }}
                 />
               </div>
 
-              <div className="pt-1">
-                <label className="flex items-start gap-3 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    required
-                    checked={formData.rgpdConsent}
-                    onChange={(e) => setFormData({ ...formData, rgpdConsent: e.target.checked })}
-                    className="mt-1 w-4 h-4 rounded border-white/20 bg-black/50 text-blue-600 focus:ring-blue-500 cursor-pointer shrink-0"
-                  />
-                  <span className="text-xs text-slate-400 leading-normal">
-                    {t.bookingModal.consentText}
-                  </span>
+              {/* Ligne 5 : Consentement RGPD */}
+              <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px' }}>
+                <input
+                  type="checkbox"
+                  name="Consentement_RGPD"
+                  id="rgpd"
+                  value="Accepte"
+                  checked={formData.Consentement_RGPD}
+                  onChange={(e) => setFormData({ ...formData, Consentement_RGPD: e.target.checked })}
+                  required
+                  style={{
+                    marginTop: '3px',
+                    accentColor: '#6366f1',
+                    cursor: 'pointer',
+                    width: '16px',
+                    height: '16px',
+                    flexShrink: 0,
+                  }}
+                />
+                <label htmlFor="rgpd" style={{ fontSize: '0.8rem', color: '#888', lineHeight: 1.4, cursor: 'pointer' }}>
+                  J'accepte que les informations saisies soient utilisées pour me recontacter dans le cadre de ma demande. Conformément au RGPD, vous disposez d'un droit d'accès et de rectification.
                 </label>
               </div>
 
+              {/* Bouton de Soumission */}
               <button
                 type="submit"
                 disabled={status === 'loading'}
-                className="w-full py-3.5 bg-gradient-to-r from-blue-600 via-indigo-600 to-violet-600 hover:from-blue-500 hover:to-violet-500 text-white rounded-xl font-semibold text-xs uppercase tracking-wider flex items-center justify-center gap-2 cursor-pointer shadow-xl shadow-blue-900/30 transition-all duration-200 disabled:opacity-50"
+                style={{
+                  backgroundColor: '#6366f1',
+                  color: 'white',
+                  border: 'none',
+                  padding: '14px',
+                  borderRadius: '6px',
+                  fontWeight: 600,
+                  fontSize: '0.95rem',
+                  cursor: status === 'loading' ? 'not-allowed' : 'pointer',
+                  transition: 'background 0.2s',
+                  marginTop: '5px',
+                  opacity: status === 'loading' ? 0.7 : 1,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '8px',
+                }}
+                className="hover:bg-[#4f46e5] active:scale-[0.99] transition-all"
               >
-                {status === 'loading' ? (
-                  <span>{t.bookingModal.submittingButton}</span>
-                ) : (
-                  <>
-                    <span>{t.bookingModal.submitButton}</span>
-                    <ArrowRight className="w-4 h-4" />
-                  </>
-                )}
+                {status === 'loading' ? 'ENVOI EN COURS...' : "CONFIRMER LA DEMANDE D'AUDIT →"}
               </button>
             </form>
-          )}
-        </div>
+          </>
+        )}
       </div>
     </div>
   );

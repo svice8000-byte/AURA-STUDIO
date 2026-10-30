@@ -70,31 +70,38 @@ async function startServer() {
 
   // API endpoint for consultation booking
   app.post('/api/booking', (req, res) => {
-    const { name, email, company, service, budget, timeline, projectDetails, rgpdConsent } = req.body;
+    const name = req.body.Nom_Et_Prenom || req.body.name;
+    const email = req.body.Email_Professionnel || req.body.email;
+    const company = req.body.Entreprise_Projet || req.body.company;
+    const service = req.body.Service_Requis || req.body.service;
+    const budget = req.body.Budget_Estime || req.body.budget;
+    const timeline = req.body.Delai_Souhaite || req.body.timeline;
+    const projectDetails = req.body.Description_Projet || req.body.projectDetails;
+    const consent = req.body.Consentement_RGPD === 'Accepte' || req.body.Consentement_RGPD === true || req.body.rgpdConsent === true;
 
-    if (!email || !email.includes('@') || !rgpdConsent) {
-      return res.status(400).json({ success: false, error: 'Faltan campos obligatorios o el consentimiento de privacidad.' });
+    if (!email || !email.includes('@') || !consent) {
+      return res.status(400).json({ success: false, error: 'Faltan campos obligatorios o el consentimiento de privacidad / Champs obligatoires manquants.' });
     }
 
     const bookingEntry = {
       id: `book_${Date.now()}`,
-      name: name?.trim() || 'Cliente Potencial',
+      name: name?.trim() || 'Client / Lead B2B',
       email: email.trim().toLowerCase(),
-      company: company?.trim() || 'Empresa Tech',
-      service: service?.trim() || 'non-spécifié',
-      budget: budget || '10.000€ - 25.000€',
-      timeline: timeline || '1 a 3 meses',
-      projectDetails: projectDetails?.trim() || 'Consulta inicial de viabilidad técnica y rediseño',
-      rgpdConsent: true,
+      company: company?.trim() || 'Entreprise / Startup',
+      service: service?.trim() || 'Audit Technique',
+      budget: budget || '3.000€ - 7.500€',
+      timeline: timeline || '1 - 2 mois',
+      projectDetails: projectDetails?.trim() || 'Demande d\'audit technique de faisabilité',
+      consent: true,
       createdAt: new Date().toISOString()
     };
 
     bookings.push(bookingEntry);
-    console.log('>>> [CONSULTATION BOOKING RECEIVED]:', JSON.stringify(bookingEntry, null, 2));
+    console.log('>>> [CONSULTATION AUDIT BOOKING RECEIVED]:', JSON.stringify(bookingEntry, null, 2));
 
     return res.status(200).json({
       success: true,
-      message: 'Solicitud de consulta reservada con éxito. Revisaremos tu arquitectura y te responderemos en menos de 24 horas laborables.',
+      message: 'Demande d\'audit technique enregistrée avec succès. Notre équipe analysera votre architecture sous 24h ouvrées.',
       bookingId: bookingEntry.id
     });
   });
